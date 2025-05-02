@@ -1,0 +1,1676 @@
+---
+title: "IB-HR"
+format: pdf
+editor: visual
+---wdw
+---
+
+```{r Data_Directory}
+pacman::p_load(markdown, dplyr, ggplot2, readxl, openxlsx, cellranger, tidyr, writexl, purrr, stringdist, lubridate,countrycode, rnaturalearth, sf, DataExplorer, stringr, tidymodels, skimr, modelsummary, naniar, ranger, vip, xgboost, randomForest, VIM, caret, glmnet, doParallel, foreach, haven, pscl, themis, car, gt, pROC, patchwork, pdp, iml, stargazer, summarytools, scales, gridExtra)
+
+setwd("/Users/louisfriedrich/Desktop/Uni/ALU/Master/HR/Dokument")
+```
+
+```{r Sectors}
+#|  title: Category
+# bhrrc Data
+
+transparent0 <- read.csv("BHRRC_imputed.csv")
+
+transparent1 <- transparent0 %>%
+  mutate(SectorCategory = case_when(
+    Company.Sectors == "Metals & steel|Mining" ~ "Extractive",
+    Company.Sectors == "Metals & steel|Mining|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Hydrogen|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Mining|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Energy|Hydrogen|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Energy|Hydropower & dam projects" ~ "Extractive",
+    Company.Sectors == "Mining|Nuclear energy" ~ "Extractive",
+    Company.Sectors == "Hydrogen|Mining" ~ "Extractive",
+    Company.Sectors == "Engineering|Mining" ~ "Extractive",
+    Company.Sectors == "Energy|Mining" ~ "Extractive",
+    Company.Sectors == "Energy|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Agriculture & livestock|Bioenergy" ~ "Extractive",
+    Company.Sectors == "Construction|Mining" ~ "Extractive",
+    Company.Sectors == "Chemical: General|Mining" ~ "Extractive",
+    Company.Sectors == "Metals & steel|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Construction|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Metals & steel|Plastics" ~ "Extractive",
+    Company.Sectors == "Mining|Sand" ~ "Extractive",
+    Company.Sectors == "Energy|Metals & steel|Mining" ~ "Extractive",
+    Company.Sectors == "Machine & machine tools|Mining" ~ "Extractive",
+    Company.Sectors == "Energy|Metals & steel" ~ "Extractive",
+    Company.Sectors == "Chemical: General|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Logging & lumber|Paper & cardboard" ~ "Extractive",
+    Company.Sectors == "Palm trees & oil|Rubber" ~ "Extractive",
+    Company.Sectors == "Agriculture & livestock|Palm trees & oil" ~ "Extractive",
+    Company.Sectors == "Cosmetics|Toiletries & soap" ~ "Extractive",
+    Company.Sectors == "Agriculture & livestock|Bioenergy|Palm trees & oil" ~ "Extractive",
+    Company.Sectors == "Energy|Oil, gas & coal|Technology, telecom & electronics" ~ "Extractive",
+    Company.Sectors == "Construction|Engineering|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Energy|Logging & lumber|Mining" ~ "Extractive",
+    Company.Sectors == "Diamond|Mining" ~ "Extractive",
+    Company.Sectors == "Oil, gas & coal|Petrol stations" ~ "Extractive",
+    Company.Sectors == "Engineering|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Mining" ~ "Extractive",
+    Company.Sectors == "Bioenergy|Logging & lumber|Paper & cardboard" ~ "Extractive",
+    Company.Sectors == "Logging & lumber|Oil, gas & coal|Paper & cardboard" ~ "Extractive",
+    Company.Sectors == "Construction|Logging & lumber" ~ "Extractive",
+    Company.Sectors == "Nuclear energy|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Diamond|Jewellery|Watch & clock" ~ "Extractive",
+    Company.Sectors == "Oil, gas & coal|Waste disposal" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Palm trees & oil|Rubber" ~ "Extractive",
+    Company.Sectors == "Construction|Hydropower & dam projects" ~ "Extractive",
+    Company.Sectors == "Palm trees & oil|Paper & cardboard" ~ "Extractive",
+    Company.Sectors == "Hydrogen|Mining|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Mining|Real estate sales" ~ "Extractive",
+    Company.Sectors == "Mining|Renewable energy" ~ "Extractive",
+    Company.Sectors == "Military/defence|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Building materials & equipment|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Finance & banking|Metals & steel|Mining" ~ "Extractive",
+    Company.Sectors == "Building materials & equipment|Oil, gas & coal|Retail" ~ "Extractive",
+    Company.Sectors == "Mining|Oil, gas & coal|Utilities: General" ~ "Extractive",
+    Company.Sectors == "Machine & machine tools|Mining|Technology: General" ~ "Extractive",
+    Company.Sectors == "Chemical: General|Cosmetics|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Logging & lumber" ~ "Extractive",
+    Company.Sectors == "Hydropower & dam projects|Mining" ~ "Extractive",
+    Company.Sectors == "Hydropower & dam projects|Renewable energy" ~ "Extractive",
+    Company.Sectors == "Flooring|Logging & lumber|Paper & cardboard" ~ "Extractive",
+    Company.Sectors == "Hydrogen|Metals & steel|Mining" ~ "Extractive",
+    Company.Sectors == "Building materials & equipment|Construction|Mining" ~ "Extractive",
+    Company.Sectors == "Oil, gas & coal|Plastics" ~ "Extractive",
+    Company.Sectors == "Engineering|Hydrogen|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Energy|Natural Resources: General" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Palm trees & oil|Paper & cardboard" ~ "Extractive",
+    Company.Sectors == "Agriculture & livestock|Mining" ~ "Extractive",
+    Company.Sectors == "Energy|Palm trees & oil" ~ "Extractive",
+    Company.Sectors == "Mining|Natural Resources: General" ~ "Extractive",
+    Company.Sectors == "Finance & banking|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Agriculture & livestock|Palm trees & oil|Technology: General" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Military/defence|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Investment|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Hydropower & dam projects|Medical equipment/supplies|Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Diversified/Conglomerates|Palm trees & oil" ~ "Extractive",
+    Company.Sectors == "Energy|Mining|Natural Resources: General" ~ "Extractive",
+    Company.Sectors == "Geothermal energy|Mining" ~ "Extractive",
+    Company.Sectors == "Chemical: General|Metals/plastics/basic materials: General" ~ "Extractive",
+    Company.Sectors == "Hydropower & dam projects|Manufacturing: General|Real estate sales" ~ "Extractive",
+    Company.Sectors == "Manufacturing: General|Metals/plastics/basic materials: General" ~ "Extractive",
+    Company.Sectors == "Construction & building materials: General|Mining" ~ "Extractive",
+    Company.Sectors == "Wind energy" ~ "Extractive",
+    Company.Sectors == "Hydropower & dam projects" ~ "Extractive",
+    Company.Sectors == "Mining" ~ "Extractive",
+    Company.Sectors == "Diamond" ~ "Extractive",
+    Company.Sectors == "Oil, gas & coal" ~ "Extractive",
+    Company.Sectors == "Logging & lumber" ~ "Extractive",
+    Company.Sectors == "Bioenergy" ~ "Extractive",
+    Company.Sectors == "Palm trees & oil" ~ "Extractive",
+    Company.Sectors == "Nuclear energy" ~ "Extractive",
+    Company.Sectors == "Rubber" ~ "Extractive",
+    Company.Sectors == "Paper & cardboard" ~ "Extractive",
+    Company.Sectors == "Renewable energy" ~ "Extractive",
+    Company.Sectors == "Solar energy" ~ "Extractive",
+    Company.Sectors == "Natural Resources: General" ~ "Extractive",
+    Company.Sectors == "Geothermal energy" ~ "Extractive",
+    Company.Sectors == "Agriculture & livestock|Energy|Engineering" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Insurance" ~ "Financial services",
+    Company.Sectors == "Electrical appliance|Energy|Insurance" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Real estate sales" ~ "Financial services",
+    Company.Sectors == "Insurance|Real estate: General" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Fertiliser" ~ "Financial services",
+    Company.Sectors == "Diversified/Conglomerates|Insurance" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Sugar" ~ "Financial services",
+    Company.Sectors == "Auditing, consulting & accounting|Finance & banking" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Construction|Real estate sales" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Construction|Real estate: General" ~ "Financial services",
+    Company.Sectors == "Auditing, consulting & accounting|Property development" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Pesticide" ~ "Financial services",
+    Company.Sectors == "Clothing & textile|Finance & banking" ~ "Financial services",
+    Company.Sectors == "Clothing & textile|Insurance" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Diversified/Conglomerates" ~ "Financial services",
+    Company.Sectors == "Department stores|Finance & banking" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Auto parts|Chemical: General" ~ "Financial services",
+    Company.Sectors == "Health and social care|Insurance" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Transport: General" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Finance & banking" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Chemical: General" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Clothing & textile" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Mining" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Renewable energy|Solar energy" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Health Sector: General" ~ "Financial services",
+    Company.Sectors == "Biotechnology|Finance & banking" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Technology: General" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Ethanol|Sugar" ~ "Financial services",
+    Company.Sectors == "Finance & banking|Investment" ~ "Financial services",
+    Company.Sectors == "Auditing, consulting & accounting|Construction" ~ "Financial services",
+    Company.Sectors == "Insurance|Shipping & handling: General" ~ "Financial services",
+    Company.Sectors == "Investment|Real estate: General" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Recruitment agencies|Services: General" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Labour supplier" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Coffee" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Services: General" ~ "Financial services",
+    Company.Sectors == "Agriculture & livestock|Fertiliser|Pesticide" ~ "Financial services",
+    Company.Sectors == "Finance & banking" ~ "Financial services",
+    Company.Sectors == "Recruitment agencies" ~ "Financial services",
+    Company.Sectors == "Auditing, consulting & accounting" ~ "Financial services",
+    Company.Sectors == "Insurance" ~ "Financial services",
+    Company.Sectors == "Stock exchanges" ~ "Financial services",
+    Company.Sectors == "Postal services" ~ "Financial services",
+    Company.Sectors == "Investment" ~ "Financial services",
+    Company.Sectors == "Pharmacies" ~ "Financial services",
+    Company.Sectors == "Fishing|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Coffee|Restaurants & bars" ~ "Food and beverage",
+    Company.Sectors == "Coffee|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Supermarkets & grocery" ~ "Food and beverage",
+    Company.Sectors == "Agriculture & livestock|Fishing|Food & beverage|Tea" ~ "Food and beverage",
+    Company.Sectors == "Agriculture & livestock|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Diversified/Conglomerates|Mining" ~ "Food and beverage",
+    Company.Sectors == "Clothing & textile|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Palm trees & oil" ~ "Food and beverage",
+    Company.Sectors == "Diversified/Conglomerates|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Tea" ~ "Food and beverage",
+    Company.Sectors == "Amusement park|Coffee|Food & beverage|Restaurants & bars|Retail" ~ "Food and beverage",
+    Company.Sectors == "Chocolate & cocoa|Food & beverage|Supermarkets & grocery" ~ "Food and beverage",
+    Company.Sectors == "Coffee|Cosmetics|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Rubber|Tea" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Logging & lumber" ~ "Food and beverage",
+    Company.Sectors == "Aircraft/Airline|Catering & food services" ~ "Food and beverage",
+    Company.Sectors == "Express delivery|Food & beverage|Technology: Internet & social media" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services|Express delivery" ~ "Food and beverage",
+    Company.Sectors == "Cosmetics|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Consumer products/retail: General|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Agriculture & livestock" ~ "Food and beverage",
+    Company.Sectors == "Energy|Sugar" ~ "Food and beverage",
+    Company.Sectors == "Agriculture & livestock|Palm trees & oil|Sugar" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Sugar" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services|Food & beverage|Restaurants & bars" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Palm trees & oil" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Agriculture & livestock|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Agriculture & livestock|Food & beverage|Pesticide" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Logging & lumber" ~ "Food and beverage",
+    Company.Sectors == "Coffee|Tea" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services|Food & beverage|Technology, telecom & electronics" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services|Hotel|Real estate: General" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services|Express delivery|Technology: Internet & social media" ~ "Food and beverage",
+    Company.Sectors == "Cosmetics|Food & beverage|Palm trees & oil" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Labour supplier" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Health Sector: General" ~ "Food and beverage",
+    Company.Sectors == "Coffee|Restaurants & bars|Tea" ~ "Food and beverage",
+    Company.Sectors == "Express delivery|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Technology: General" ~ "Food and beverage",
+    Company.Sectors == "Fishing|Food & beverage|Packaging" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Coffee" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Technology, telecom & electronics" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage|Retail" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services|Restaurants & bars" ~ "Food and beverage",
+    Company.Sectors == "Bioenergy|Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Food & beverage" ~ "Food and beverage",
+    Company.Sectors == "Agriculture & livestock" ~ "Food and beverage",
+    Company.Sectors == "Tobacco" ~ "Food and beverage",
+    Company.Sectors == "Sugar" ~ "Food and beverage",
+    Company.Sectors == "Fishing" ~ "Food and beverage",
+    Company.Sectors == "Restaurants & bars" ~ "Food and beverage",
+    Company.Sectors == "Coffee" ~ "Food and beverage",
+    Company.Sectors == "Chocolate & cocoa" ~ "Food and beverage",
+    Company.Sectors == "Catering & food services" ~ "Food and beverage",
+    Company.Sectors == "Cookware" ~ "Food and beverage",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General" ~ "Food and beverage",
+    Company.Sectors == "Tea" ~ "Food and beverage",
+    Company.Sectors == "Slaughterhouses" ~ "Food and beverage",
+    Company.Sectors == "Candy" ~ "Food and beverage",
+    Company.Sectors == "Baby food & baby milk" ~ "Food and beverage",
+    Company.Sectors == "Construction|Road-building" ~ "Heavy manufacturing",
+    Company.Sectors == "Energy|Engineering|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Property development|Property management" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Energy|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Agricultural machinery|Construction machinery & vehicles|Machine & machine tools" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles|Auto parts" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Metals & steel|Technology, telecom & electronics" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles|Hydrogen" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles|Auto parts|Engineering" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Real estate sales" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Engineering" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Renewable energy" ~ "Heavy manufacturing",
+    Company.Sectors == "Arms/Weapons|Manufacturing: General|Military/defence" ~ "Heavy manufacturing",
+    Company.Sectors == "Building materials & equipment|Cement" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Property development" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts|Electrical appliance" ~ "Heavy manufacturing",
+    Company.Sectors == "Agricultural machinery|Metals & steel" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles|Transport: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Building materials & equipment|Construction" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Diversified/Conglomerates" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles|Engineering" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Diversified/Conglomerates|Road-building" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Paper & cardboard" ~ "Heavy manufacturing",
+    Company.Sectors == "Hydrogen|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Cement|Engineering" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction machinery & vehicles|Machine & machine tools" ~ "Heavy manufacturing",
+    Company.Sectors == "Aircraft/Airline|Automobile & other motor vehicles" ~ "Heavy manufacturing",
+    Company.Sectors == "Agricultural machinery|Construction|Mining" ~ "Heavy manufacturing",
+    Company.Sectors == "Air conditioning|Electrical appliance|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Energy" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Glass" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Hydrogen" ~ "Heavy manufacturing",
+    Company.Sectors == "Aircraft/Airline|Automobile & other motor vehicles|Metals & steel" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Health Sector: General|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Metals & steel" ~ "Heavy manufacturing",
+    Company.Sectors == "Clothing & textile|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Agricultural machinery|Construction machinery & vehicles|Energy|Engineering" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts|Tire" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Property development|Real estate sales" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Ports" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Real estate: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Construction & building materials: General|Engineering" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Construction & building materials: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Building materials & equipment|Construction|Construction & building materials: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Engineering|Road-building" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Transport: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts|Chemical: General|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction & building materials: General|Road-building" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Real estate: General|Road-building" ~ "Heavy manufacturing",
+    Company.Sectors == "Footwear|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Energy|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction|Transport: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Biotechnology|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Metals & steel" ~ "Heavy manufacturing",
+    Company.Sectors == "Electrical appliance|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts|Bicycle|Retail" ~ "Heavy manufacturing",
+    Company.Sectors == "Bicycle|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Plastics" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles|Auto parts|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts|Transport: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Trucking" ~ "Heavy manufacturing",
+    Company.Sectors == "Glass|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Arms/Weapons|Automobile & other motor vehicles|Military/defence" ~ "Heavy manufacturing",
+    Company.Sectors == "Machine & machine tools|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Sports: General|Technology: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Clothing & textile|Construction machinery & vehicles" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts|Leather & tanneries" ~ "Heavy manufacturing",
+    Company.Sectors == "Machine & machine tools|Water companies" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto rental|Taxi" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles|Battery" ~ "Heavy manufacturing",
+    Company.Sectors == "Cement|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Machine & machine tools|Technology: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Chemical: General|Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General|Technology: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction" ~ "Heavy manufacturing",
+    Company.Sectors == "Metals & steel" ~ "Heavy manufacturing",
+    Company.Sectors == "Automobile & other motor vehicles" ~ "Heavy manufacturing",
+    Company.Sectors == "Cement" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction machinery & vehicles" ~ "Heavy manufacturing",
+    Company.Sectors == "Building materials & equipment" ~ "Heavy manufacturing",
+    Company.Sectors == "Engineering" ~ "Heavy manufacturing",
+    Company.Sectors == "Manufacturing: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Plastics" ~ "Heavy manufacturing",
+    Company.Sectors == "Tire" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto repair & maintenance" ~ "Heavy manufacturing",
+    Company.Sectors == "Auto parts" ~ "Heavy manufacturing",
+    Company.Sectors == "Electrical appliance" ~ "Heavy manufacturing",
+    Company.Sectors == "Construction & building materials: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Furniture" ~ "Heavy manufacturing",
+    Company.Sectors == "Ceramics" ~ "Heavy manufacturing",
+    Company.Sectors == "Machine & machine tools" ~ "Heavy manufacturing",
+    Company.Sectors == "Adhesives & glue" ~ "Heavy manufacturing",
+    Company.Sectors == "Battery" ~ "Heavy manufacturing",
+    Company.Sectors == "Agricultural machinery" ~ "Heavy manufacturing",
+    Company.Sectors == "Glass" ~ "Heavy manufacturing",
+    Company.Sectors == "Metals/plastics/basic materials: General" ~ "Heavy manufacturing",
+    Company.Sectors == "Salt" ~ "Heavy manufacturing",
+    Company.Sectors == "Technology: Artificial Intelligence (AI)|Technology: General|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Technology: Internet & social media|Technology: Software & Services" ~ "Information technology",
+    Company.Sectors == "Technology: General|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Diversified/Conglomerates|Retail" ~ "Information technology",
+    Company.Sectors == "Military/weapons/security equipment: General|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Entertainment|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Technology: Internet & social media|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Media & publishing: General|Technology: General" ~ "Information technology",
+    Company.Sectors == "Advertising & marketing|Technology: General|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Engineering|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Security companies|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Chemical: General|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Electrical appliance|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Auditing, consulting & accounting|Technology: Artificial Intelligence (AI)|Technology: Software & Services" ~ "Information technology",
+    Company.Sectors == "Manufacturing: General|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Arms/Weapons|Military/defence|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Energy|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Hydropower & dam projects|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Auto parts|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Household products|Office supplies & stationery" ~ "Information technology",
+    Company.Sectors == "Machine & machine tools|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Diversified/Conglomerates|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Technology: Internet & social media|Tourism" ~ "Information technology",
+    Company.Sectors == "Call centre|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Taxi|Technology: General|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Taxi|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Auditing, consulting & accounting|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Amusement park|Retail" ~ "Information technology",
+    Company.Sectors == "Military/defence|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Advertising & marketing|Printing & copying" ~ "Information technology",
+    Company.Sectors == "Express delivery|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Mining|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Military/weapons/security equipment: General|Technology: Artificial Intelligence (AI)|Technology: General" ~ "Information technology",
+    Company.Sectors == "Military/defence|Technology: General|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Finance & banking|Technology: General|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Military/weapons/security equipment: General|Technology: Artificial Intelligence (AI)|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Entertainment|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Finance & banking|Technology: Artificial Intelligence (AI)|Technology: General" ~ "Information technology",
+    Company.Sectors == "Technology: Artificial Intelligence (AI)|Technology: General" ~ "Information technology",
+    Company.Sectors == "Cleaning & maintenance|Security companies" ~ "Information technology",
+    Company.Sectors == "Security companies|Technology: Artificial Intelligence (AI)" ~ "Information technology",
+    Company.Sectors == "Services: General|Technology: General" ~ "Information technology",
+    Company.Sectors == "Security companies|Technology: General" ~ "Information technology",
+    Company.Sectors == "Technology: Software & Services|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Air conditioning|Electrical appliance|Engineering" ~ "Information technology",
+    Company.Sectors == "Diversified/Conglomerates|Express delivery|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Energy|Engineering|Technology: Automation" ~ "Information technology",
+    Company.Sectors == "Media & publishing: General|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Dating agencies|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Express delivery|Retail|Technology: General" ~ "Information technology",
+    Company.Sectors == "Technology: General|Technology: Software & Services" ~ "Information technology",
+    Company.Sectors == "Military/weapons/security equipment: General|Technology: Software & Services|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Technology: Artificial Intelligence (AI)|Technology: Automation|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Technology: General|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Services: General|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Pharmacies|Retail" ~ "Information technology",
+    Company.Sectors == "Retail|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Technology: Artificial Intelligence (AI)|Technology: General|Technology: Software & Services" ~ "Information technology",
+    Company.Sectors == "Clothing & textile|Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Engineering|Pharmaceutical|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Shipping, ship-building & ship-scrapping|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Manufacturing: General|Technology, telecom & electronics|Transport: General" ~ "Information technology",
+    Company.Sectors == "Biotechnology|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Media & publishing: General|Technology: Internet & social media|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Construction|Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Security companies|Technology: Software & Services" ~ "Information technology",
+    Company.Sectors == "Technology, telecom & electronics" ~ "Information technology",
+    Company.Sectors == "Technology: Internet & social media" ~ "Information technology",
+    Company.Sectors == "Technology: Software & Services" ~ "Information technology",
+    Company.Sectors == "Office equipment" ~ "Information technology",
+    Company.Sectors == "Printing & copying" ~ "Information technology",
+    Company.Sectors == "Call centre" ~ "Information technology",
+    Company.Sectors == "Technology: General" ~ "Information technology",
+    Company.Sectors == "Technology: Artificial Intelligence (AI)" ~ "Information technology",
+    Company.Sectors == "Chemical: General|Waste disposal" ~ "Infrastructure and utilities",
+    Company.Sectors == "Diversified/Conglomerates|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Nuclear energy|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Waste disposal|Water companies" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Hydropower & dam projects|Water companies" ~ "Infrastructure and utilities",
+    Company.Sectors == "Hydrogen|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Aircraft/Airline|Military/defence" ~ "Infrastructure and utilities",
+    Company.Sectors == "Construction|Energy|Shipping, ship-building & ship-scrapping" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Hydrogen" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Wind energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Aircraft/Airline|Military/defence|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Bus|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Engineering|Hydrogen|Ports" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Engineering" ~ "Infrastructure and utilities",
+    Company.Sectors == "Hydrogen|Ports" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Hydropower & dam projects|Wind energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Nuclear energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Road-building" ~ "Infrastructure and utilities",
+    Company.Sectors == "Engineering|Railroad" ~ "Infrastructure and utilities",
+    Company.Sectors == "Geothermal energy|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Aircraft/Airline|Energy|Military/defence" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Hydropower & dam projects|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Engineering|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Freight handling|Shipping, ship-building & ship-scrapping" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Health Sector: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Hydrogen|Renewable energy|Solar energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Renewable energy|Technology, telecom & electronics" ~ "Infrastructure and utilities",
+    Company.Sectors == "Construction|Energy|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Renewable energy|Wind energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Aircraft/Airline|Engineering" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Metals & steel|Waste disposal" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Water companies" ~ "Infrastructure and utilities",
+    Company.Sectors == "Freight handling|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Ports|Shipping, ship-building & ship-scrapping" ~ "Infrastructure and utilities",
+    Company.Sectors == "Shipping & handling: General|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Solar energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Railroad|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Freight handling|Ports|Shipping, ship-building & ship-scrapping|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Renewable energy|Solar energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Freight handling|Shipping & handling: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Engineering|Solar energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Manufacturing: General|Solar energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Battery|Renewable energy|Solar energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Construction|Renewable energy|Solar energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Ferry|Ports|Shipping, ship-building & ship-scrapping" ~ "Infrastructure and utilities",
+    Company.Sectors == "Sports: General|Sports teams, clubs & leagues" ~ "Infrastructure and utilities",
+    Company.Sectors == "Security companies|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Agriculture & livestock|Energy|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Chemical: General|Energy|Retail" ~ "Infrastructure and utilities",
+    Company.Sectors == "Transport: General|Trucking" ~ "Infrastructure and utilities",
+    Company.Sectors == "Sports: General|Technology: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Cleaning & maintenance|Security companies|Waste disposal" ~ "Infrastructure and utilities",
+    Company.Sectors == "Renewable energy|Safety/environment: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Labour supplier|Shipping, ship-building & ship-scrapping" ~ "Infrastructure and utilities",
+    Company.Sectors == "Express delivery|Taxi|Technology: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Taxi|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Aircraft/Airline|Diversified/Conglomerates" ~ "Infrastructure and utilities",
+    Company.Sectors == "Engineering|Wind energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Storage|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Cleaning & maintenance|Environmental equipment|Waste disposal" ~ "Infrastructure and utilities",
+    Company.Sectors == "Clothing & textile|Sports: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Express delivery|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy|Renewable energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Shipping, ship-building & ship-scrapping|Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Energy" ~ "Infrastructure and utilities",
+    Company.Sectors == "Road-building" ~ "Infrastructure and utilities",
+    Company.Sectors == "Water companies" ~ "Infrastructure and utilities",
+    Company.Sectors == "Express delivery" ~ "Infrastructure and utilities",
+    Company.Sectors == "Airports" ~ "Infrastructure and utilities",
+    Company.Sectors == "Aircraft/Airline" ~ "Infrastructure and utilities",
+    Company.Sectors == "Bus" ~ "Infrastructure and utilities",
+    Company.Sectors == "Shipping, ship-building & ship-scrapping" ~ "Infrastructure and utilities",
+    Company.Sectors == "Freight handling" ~ "Infrastructure and utilities",
+    Company.Sectors == "Waste disposal" ~ "Infrastructure and utilities",
+    Company.Sectors == "Ports" ~ "Infrastructure and utilities",
+    Company.Sectors == "Transport: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Taxi" ~ "Infrastructure and utilities",
+    Company.Sectors == "Trucking" ~ "Infrastructure and utilities",
+    Company.Sectors == "Railroad" ~ "Infrastructure and utilities",
+    Company.Sectors == "Shipping & handling: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Heating & boilers" ~ "Infrastructure and utilities",
+    Company.Sectors == "Utilities: General" ~ "Infrastructure and utilities",
+    Company.Sectors == "Architects" ~ "Infrastructure and utilities",
+    Company.Sectors == "Petrol stations" ~ "Infrastructure and utilities",
+    Company.Sectors == "Construction|Engineering|Mining|Railroad" ~ "Other",
+    Company.Sectors == "Advertising & marketing|Entertainment|Finance & banking|Technology: Artificial Intelligence (AI)|Technology: General|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Clothing & textile|Entertainment|Express delivery|Retail|Technology: Artificial Intelligence (AI)|Technology: General|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Energy|Metals & steel|Mining|Oil, gas & coal" ~ "Other",
+    Company.Sectors == "Bioenergy|Energy|Ethanol|Sugar" ~ "Other",
+    Company.Sectors == "Entertainment|Technology: Internet & social media|Technology: Software & Services|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Energy|Oil, gas & coal|Waste disposal|Water companies" ~ "Other",
+    Company.Sectors == "Energy|Mining|Nuclear energy|Oil, gas & coal|Water companies" ~ "Other",
+    Company.Sectors == "Agricultural machinery|Automobile & other motor vehicles|Chemical: General|Diversified/Conglomerates|Machine & machine tools|Metals & steel|Oil, gas & coal|Palm trees & oil" ~ "Other",
+    Company.Sectors == "Construction|Diversified/Conglomerates|Energy|Engineering|Health and social care|Metals & steel|Military/defence|Mining|Nuclear energy|Railroad|Road-building|Security companies|Technology, telecom & electronics|Transport: General" ~ "Other",
+    Company.Sectors == "Cement|Diversified/Conglomerates|Energy|Ports|Real estate sales" ~ "Other",
+    Company.Sectors == "Construction|Diversified/Conglomerates|Finance & banking|Property development" ~ "Other",
+    Company.Sectors == "Education companies|Finance & banking|Fitness clubs & gyms|Health and social care|Hotel|Pharmacies|Property management|Supermarkets & grocery|Tourism" ~ "Other",
+    Company.Sectors == "Construction|Energy|Engineering|Metals & steel|Oil, gas & coal|Ports|Real estate sales|Shipping, ship-building & ship-scrapping|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Hotel|Tourism" ~ "Other",
+    Company.Sectors == "Construction|Energy|Engineering|Finance & banking|Food & beverage|Metals & steel|Mining" ~ "Other",
+    Company.Sectors == "Cruise ship|Tourism" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Clothing & textile|Construction|Diversified/Conglomerates|Energy|Engineering|Health and social care|Property development|Property management" ~ "Other",
+    Company.Sectors == "Military/weapons/security equipment: General|Security companies|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Diversified/Conglomerates|Engineering" ~ "Other",
+    Company.Sectors == "Engineering|Security companies" ~ "Other",
+    Company.Sectors == "Diversified/Conglomerates|Finance & banking|Logging & lumber|Palm trees & oil|Paper & cardboard|Property development|Property management" ~ "Other",
+    Company.Sectors == "Chemical: General|Energy|Finance & banking|Food & beverage" ~ "Other",
+    Company.Sectors == "Construction|Engineering|Property development|Property management" ~ "Other",
+    Company.Sectors == "Airports|Cement|Construction|Energy|Engineering|Railroad|Road-building" ~ "Other",
+    Company.Sectors == "Arms/Weapons|Military/defence" ~ "Other",
+    Company.Sectors == "Construction|Engineering|Hydropower & dam projects|Mining|Moving|Road-building" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Bioenergy|Energy|Food & beverage|Freight handling|Shipping, ship-building & ship-scrapping|Sugar" ~ "Other",
+    Company.Sectors == "Property development|Property management" ~ "Other",
+    Company.Sectors == "Diversified/Conglomerates|Education companies|Finance & banking|Food & beverage|Freight handling|Property development|Property management|Real estate sales|Shipping, ship-building & ship-scrapping|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Aircraft/Airline|Food & beverage|Real estate sales|Shipping, ship-building & ship-scrapping" ~ "Other",
+    Company.Sectors == "Express delivery|Postal services" ~ "Other",
+    Company.Sectors == "Military/defence|Security companies" ~ "Other",
+    Company.Sectors == "Airports|Construction|Diversified/Conglomerates|Energy|Engineering|Hydropower & dam projects|Oil, gas & coal|Ports|Road-building|Transport: General|Waste disposal|Water companies" ~ "Other",
+    Company.Sectors == "Construction|Electrical appliance|Medical equipment/supplies|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Chemical: General|Energy|Food & beverage|Hydrogen|Nuclear energy|Transport: General" ~ "Other",
+    Company.Sectors == "Construction|Engineering|Oil, gas & coal|Ports" ~ "Other",
+    Company.Sectors == "Construction|Energy|Engineering|Oil, gas & coal" ~ "Other",
+    Company.Sectors == "Construction|Energy|Engineering|Metals & steel|Ports|Real estate sales|Shipping, ship-building & ship-scrapping|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Automobile & other motor vehicles|Construction|Media & publishing: General|Real estate sales" ~ "Other",
+    Company.Sectors == "Arms/Weapons|Engineering|Metals & steel|Military/defence|Mining" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Food & beverage|Palm trees & oil|Toiletries & soap" ~ "Other",
+    Company.Sectors == "Construction|Energy|Oil, gas & coal|Road-building" ~ "Other",
+    Company.Sectors == "Construction|Engineering|Mining|Railroad|Transport: General" ~ "Other",
+    Company.Sectors == "Construction|Hydropower & dam projects|Road-building|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Chemical: General|Palm trees & oil|Property development" ~ "Other",
+    Company.Sectors == "Construction|Diversified/Conglomerates|Energy|Tourism" ~ "Other",
+    Company.Sectors == "Construction|Diversified/Conglomerates|Engineering|Oil, gas & coal|Ports" ~ "Other",
+    Company.Sectors == "Building materials & equipment|Cement|Construction|Printing & copying|Property development|Road-building" ~ "Other",
+    Company.Sectors == "Department stores|Finance & banking|Insurance|Mining" ~ "Other",
+    Company.Sectors == "Consumer products/retail: General|Entertainment|Express delivery|Retail|Technology: General|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Construction|Golf courses|Hotel|Tourism" ~ "Other",
+    Company.Sectors == "Advertising & marketing|Diversified/Conglomerates|Entertainment|Finance & banking|Technology: Artificial Intelligence (AI)|Technology: General|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Building materials & equipment|Engineering" ~ "Other",
+    Company.Sectors == "Clothing & textile|Food & beverage|Machine & machine tools|Metals & steel|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Construction|Energy|Mining|Water companies" ~ "Other",
+    Company.Sectors == "Cement|Chemical: General|Diversified/Conglomerates|Metals & steel|Mining" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Automobile & other motor vehicles|Bioenergy|Ceramics|Diversified/Conglomerates|Food & beverage|Insurance|Logging & lumber|Media & publishing: General|Sports teams, clubs & leagues|Sugar|Trucking" ~ "Other",
+    Company.Sectors == "Military/weapons/security equipment: General|Technology: Software & Services" ~ "Other",
+    Company.Sectors == "Property development|Tourism" ~ "Other",
+    Company.Sectors == "Golf courses|Hotel|Real estate: General" ~ "Other",
+    Company.Sectors == "Golf courses|Real estate: General" ~ "Other",
+    Company.Sectors == "Hotel|Jewellery|Luggage, backpacks & bags|Perfume|Watch & clock" ~ "Other",
+    Company.Sectors == "Entertainment|Gambling" ~ "Other",
+    Company.Sectors == "Education companies|Military/defence" ~ "Other",
+    Company.Sectors == "Food & beverage|Pharmaceutical|Retail|Supermarkets & grocery" ~ "Other",
+    Company.Sectors == "Automobile & other motor vehicles|Bioenergy|Ceramics|Diversified/Conglomerates|Food & beverage|Insurance|Logging & lumber|Media & publishing: General|Sports teams, clubs & leagues|Sugar|Trucking" ~ "Other",
+    Company.Sectors == "Aircraft/Airline|Energy|Military/defence|Transport: General" ~ "Other",
+    Company.Sectors == "Building materials & equipment|Engineering|Metals & steel|Mining|Oil, gas & coal" ~ "Other",
+    Company.Sectors == "Construction|Diversified/Conglomerates|Energy|Engineering|Food & beverage|Health and social care|Metals & steel|Military/defence|Mining|Nuclear energy|Railroad|Road-building|Security companies|Sugar|Technology, telecom & electronics|Transport: General" ~ "Other",
+    Company.Sectors == "Chemical: General|Energy|Finance & banking|Food & beverage|Metals & steel|Mining|Oil, gas & coal" ~ "Other",
+    Company.Sectors == "Hotel|Technology: Internet & social media|Tourism" ~ "Other",
+    Company.Sectors == "Fishing|Packaging" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Palm trees & oil|Rubber|Tea" ~ "Other",
+    Company.Sectors == "Cement|Diversified/Conglomerates|Energy|Ports|Real estate sales|Renewable energy|Wind energy" ~ "Other",
+    Company.Sectors == "Entertainment|Hotel" ~ "Other",
+    Company.Sectors == "Clothing & textile|Food & beverage|Footwear|Retail|Supermarkets & grocery|Wholesale" ~ "Other",
+    Company.Sectors == "Hydrogen|Metals & steel|Mining|Oil, gas & coal" ~ "Other",
+    Company.Sectors == "Flooring|Logging & lumber|Manufacturing: General|Paper & cardboard" ~ "Other",
+    Company.Sectors == "Automobile & other motor vehicles|Auto parts|Chemical: General|Energy|Manufacturing: General" ~ "Other",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Finance & banking|Health Sector: General|Real estate: General" ~ "Other",
+    Company.Sectors == "Airports|Construction|Construction machinery & vehicles|Hydropower & dam projects|Ports|Railroad|Road-building" ~ "Other",
+    Company.Sectors == "Military/weapons/security equipment: General|Technology: General" ~ "Other",
+    Company.Sectors == "Electrical appliance|Hydrogen|Nuclear energy|Oil, gas & coal|Wind energy" ~ "Other",
+    Company.Sectors == "Airports|Construction|Energy|Food & beverage|Mining|Natural Resources: General|Oil, gas & coal|Real estate sales|Renewable energy|Road-building|Shipping, ship-building & ship-scrapping|Solar energy|Utilities: General|Water companies|Wind energy" ~ "Other",
+    Company.Sectors == "Military/weapons/security equipment: General|Security companies|Technology: General" ~ "Other",
+    Company.Sectors == "Hotel|Real estate: General" ~ "Other",
+    Company.Sectors == "Cleaning & maintenance|Construction|Security companies|Transport: General" ~ "Other",
+    Company.Sectors == "Catering & food services|Gambling|Tourism" ~ "Other",
+    Company.Sectors == "Real estate sales|Tourism" ~ "Other",
+    Company.Sectors == "Entertainment|Lottery|Newsagents|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Electrical appliance|Household products" ~ "Other",
+    Company.Sectors == "Finance & banking|Technology: General|Technology: Internet & social media|Technology: Software & Services" ~ "Other",
+    Company.Sectors == "Energy|Engineering|Renewable energy|Solar energy" ~ "Other",
+    Company.Sectors == "Chemical: General|Electrical appliance|Finance & banking|Food & beverage|Mining|Technology, telecom & electronics|Transport: General" ~ "Other",
+    Company.Sectors == "Domestic worker agencies|Recruitment agencies" ~ "Other",
+    Company.Sectors == "Military/weapons/security equipment: General|Security companies" ~ "Other",
+    Company.Sectors == "Chemical: General|Energy|Food & beverage|Hydrogen|Natural Resources: General|Nuclear energy|Transport: General" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Cement|Diversified/Conglomerates|Ethanol|Food & beverage|Paper & cardboard" ~ "Other",
+    Company.Sectors == "Agriculture & livestock|Clothing & textile|Construction|Energy|Hydropower & dam projects|Property development" ~ "Other",
+    Company.Sectors == "Catering & food services|Express delivery|Taxi|Technology: General|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Catering & food services|Entertainment|Gambling|Hotel|Tourism" ~ "Other",
+    Company.Sectors == "Hospitality|Hotel" ~ "Other",
+    Company.Sectors == "Catering & food services|Consumer products/retail: General|Express delivery|Food & beverage|Taxi|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Clothing & textile|Food & beverage|Retail|Supermarkets & grocery" ~ "Other",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Construction|Energy|Ethanol|Manufacturing: General|Renewable energy|Restaurants & bars|Technology: General" ~ "Other",
+    Company.Sectors == "Labour supplier|Recruitment agencies" ~ "Other",
+    Company.Sectors == "Chemical: General|Cosmetics|Food & beverage|Palm trees & oil" ~ "Other",
+    Company.Sectors == "Tourism|Travel: General" ~ "Other",
+    Company.Sectors == "Hydrogen|Utilities: General" ~ "Other",
+    Company.Sectors == "Consumer products/retail: General|Express delivery|Food & beverage|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Clothing & textile|Construction|Food & beverage|Logging & lumber|Machine & machine tools|Metals & steel|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Catering & food services|Consumer products/retail: General|Express delivery|Food & beverage|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Energy|Road-building|Technology, telecom & electronics|Transport: General" ~ "Other",
+    Company.Sectors == "Construction|Energy|Engineering|Hydropower & dam projects" ~ "Other",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Construction|Energy|Tourism" ~ "Other",
+    Company.Sectors == "Agriculture/food/beverage/tobacco/fishing: General|Energy|Health Sector: General|Transport: General" ~ "Other",
+    Company.Sectors == "Golf courses|Hospitality|Hotel" ~ "Other",
+    Company.Sectors == "Catering & food services|Consumer products/retail: General|Express delivery|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Express delivery|Services: General" ~ "Other",
+    Company.Sectors == "Consumer products/retail: General|Express delivery|Retail|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Construction|Energy|Mining|Transport: General" ~ "Other",
+    Company.Sectors == "Energy|Investment|Mining|Technology: General" ~ "Other",
+    Company.Sectors == "Construction|Fishing|Medical equipment/supplies|Mining" ~ "Other",
+    Company.Sectors == "Education companies|Recruitment agencies" ~ "Other",
+    Company.Sectors == "Entertainment|Gambling|Hotel" ~ "Other",
+    Company.Sectors == "Construction|Finance & banking|Investment|Property development|Property management|Real estate: General|Technology: General|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Chemical: General|Investment|Metals/plastics/basic materials: General|Property development" ~ "Other",
+    Company.Sectors == "Consumer products/retail: General|Entertainment|Express delivery|Food & beverage|Retail|Technology: General|Technology: Internet & social media" ~ "Other",
+    Company.Sectors == "Arms/Weapons|Security companies|Technology: General|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Cleaning & maintenance|Diversified/Conglomerates|Entertainment|Hotel|Retail|Supermarkets & grocery" ~ "Other",
+    Company.Sectors == "Construction & building materials: General|Finance & banking|Mining|Oil, gas & coal" ~ "Other",
+    Company.Sectors == "Energy|Metals & steel|Mining|Natural Resources: General" ~ "Other",
+    Company.Sectors == "Auto parts|Hydrogen|Manufacturing: General|Transport: General|Trucking" ~ "Other",
+    Company.Sectors == "Clothing & textile|Coffee|Restaurants & bars|Retail|Technology, telecom & electronics" ~ "Other",
+    Company.Sectors == "Entertainment" ~ "Other",
+    Company.Sectors == "Security companies" ~ "Other",
+    Company.Sectors == "Diversified/Conglomerates" ~ "Other",
+    Company.Sectors == "Cleaning & maintenance" ~ "Other",
+    Company.Sectors == "Property development" ~ "Other",
+    Company.Sectors == "Hotel" ~ "Other",
+    Company.Sectors == "Advertising & marketing" ~ "Other",
+    Company.Sectors == "Military/defence" ~ "Other",
+    Company.Sectors == "Media & publishing: General" ~ "Other",
+    Company.Sectors == "Ski resorts" ~ "Other",
+    Company.Sectors == "Cruise ship" ~ "Other",
+    Company.Sectors == "Arms/Weapons" ~ "Other",
+    Company.Sectors == "Law firms" ~ "Other",
+    Company.Sectors == "Public relations" ~ "Other",
+    Company.Sectors == "" ~ "Other",
+    Company.Sectors == "Tourism" ~ "Other",
+    Company.Sectors == "Environmental equipment" ~ "Other",
+    Company.Sectors == "Sports teams, clubs & leagues" ~ "Other",
+    Company.Sectors == "Memorabilia/collectibles" ~ "Other",
+    Company.Sectors == "Real estate sales" ~ "Other",
+    Company.Sectors == "Real estate: General" ~ "Other",
+    Company.Sectors == "Charity/Non-Profit" ~ "Other",
+    Company.Sectors == "Services: General" ~ "Other",
+    Company.Sectors == "Education companies" ~ "Other",
+    Company.Sectors == "Prison companies" ~ "Other",
+    Company.Sectors == "Major Sporting Events" ~ "Other",
+    Company.Sectors == "Property management" ~ "Other",
+    Company.Sectors == "Gardening & landscaping" ~ "Other",
+    Company.Sectors == "Military/weapons/security equipment: General" ~ "Other",
+    Company.Sectors == "Fitness clubs & gyms" ~ "Other",
+    Company.Sectors == "Travel: General" ~ "Other",
+    Company.Sectors == "Hairdressing & beauticians" ~ "Other",
+    Company.Sectors == "Domestic worker agencies" ~ "Other",
+    Company.Sectors == "Labour supplier" ~ "Other",
+    Company.Sectors == "Gambling" ~ "Other",
+    Company.Sectors == "Health and social care|Medical equipment/supplies" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Biotechnology|Pharmaceutical" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Chemical: General|Fertiliser" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Cosmetics|Pharmaceutical" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Chemical: General|Pesticide" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Chemical: General|Engineering" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Chemical: General|Hydrogen" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Cannabis|Health Sector: General" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Health and social care|Health Sector: General" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Clothing & textile|Medical equipment/supplies" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Arms/Weapons|Chemical: General|Fireworks" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Chemical: General" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Pharmaceutical" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Pesticide" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Biotechnology" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Health and social care" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Medical equipment/supplies" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Fertiliser" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Health Sector: General" ~ "Pharmaceutical and chemical",
+    Company.Sectors == "Clothing & textile|Supermarkets & grocery" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Retail" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Retail|Sporting goods" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Supermarkets & grocery|Tea" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Sporting goods" ~ "Retail and consumer products",
+    Company.Sectors == "Cosmetics|Perfume" ~ "Retail and consumer products",
+    Company.Sectors == "Retail|Supermarkets & grocery" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Supermarkets & grocery" ~ "Retail and consumer products",
+    Company.Sectors == "Chemical: General|Consumer products/retail: General|Retail|Supermarkets & grocery" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Department stores|Footwear" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Department stores|Retail" ~ "Retail and consumer products",
+    Company.Sectors == "Department stores|Retail" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Retail" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Perfume|Retail" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Sporting goods" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Retail|Supermarkets & grocery" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Jewellery|Luggage, backpacks & bags|Perfume|Wineries" ~ "Retail and consumer products",
+    Company.Sectors == "Retail|Supermarkets & grocery|Tourism" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Luggage, backpacks & bags" ~ "Retail and consumer products",
+    Company.Sectors == "Jewellery|Watch & clock" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Furniture|Leather & tanneries" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Department stores" ~ "Retail and consumer products",
+    Company.Sectors == "Building materials & equipment|Furniture" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Luggage, backpacks & bags" ~ "Retail and consumer products",
+    Company.Sectors == "Cleaning products|Cosmetics|Household products" ~ "Retail and consumer products",
+    Company.Sectors == "Consumer products/retail: General|Supermarkets & grocery" ~ "Retail and consumer products",
+    Company.Sectors == "Consumer products/retail: General|Retail" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Golf courses" ~ "Retail and consumer products",
+    Company.Sectors == "Consumer products/retail: General|Retail|Shipping & handling: General" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Footwear|Jewellery|Leather & tanneries|Perfume|Watch & clock" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Cosmetics|Perfume" ~ "Retail and consumer products",
+    Company.Sectors == "Cosmetics|Perfume|Toiletries & soap" ~ "Retail and consumer products",
+    Company.Sectors == "Baby product|Clothing & textile" ~ "Retail and consumer products",
+    Company.Sectors == "Flooring|Furniture" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile|Consumer products/retail: General" ~ "Retail and consumer products",
+    Company.Sectors == "Clothing & textile" ~ "Retail and consumer products",
+    Company.Sectors == "Supermarkets & grocery" ~ "Retail and consumer products",
+    Company.Sectors == "Retail" ~ "Retail and consumer products",
+    Company.Sectors == "Photographic" ~ "Retail and consumer products",
+    Company.Sectors == "Jewellery" ~ "Retail and consumer products",
+    Company.Sectors == "Toy" ~ "Retail and consumer products",
+    Company.Sectors == "Leather & tanneries" ~ "Retail and consumer products",
+    Company.Sectors == "Footwear" ~ "Retail and consumer products",
+    Company.Sectors == "Wigs" ~ "Retail and consumer products",
+    Company.Sectors == "Cosmetics" ~ "Retail and consumer products",
+    Company.Sectors == "Department stores" ~ "Retail and consumer products",
+    Company.Sectors == "Household products" ~ "Retail and consumer products",
+    Company.Sectors == "Watch & clock" ~ "Retail and consumer products",
+    Company.Sectors == "Sporting goods" ~ "Retail and consumer products",
+    Company.Sectors == "Wholesale" ~ "Retail and consumer products",
+    Company.Sectors == "Packaging" ~ "Retail and consumer products",
+    Company.Sectors == "Consumer products/retail: General" ~ "Retail and consumer products",
+    Company.Sectors == "Luggage, backpacks & bags" ~ "Retail and consumer products",
+    Company.Sectors == "Sports: General" ~ "Retail and consumer products",
+    Company.Sectors == "Bicycle" ~ "Retail and consumer products",
+    Company.Sectors == "Perfume" ~ "Retail and consumer products",
+    TRUE ~ "Other"
+  ))
+
+```
+
+```{r Headquarters}
+
+# Extrahiere das erste Land bei mehreren Ländercodes
+transparent2 <- transparent1 %>%
+  mutate(HQ_Country = ifelse(grepl("\\|", Company.Headquarters),
+                             sub("\\|.*", "", Company.Headquarters),
+                             Company.Headquarters)) %>%
+  mutate(German = ifelse(grepl("\\bDE\\b", Company.Headquarters) | grepl("\\bDE\\b", Countries), 1, 0))
+
+
+#table(transparent$HQ_Country)
+```
+
+```{r Companies}
+# zu ergänzen ggf. wenn etwas auffällt aber erstmal nebensächlich
+transparent3 <- transparent2 %>%
+  mutate(Companies = case_when(
+    Companies == "New Yorker" ~ "New Yorker",
+    Companies == "NewYorker" ~ "New Yorker",
+    Companies == "Anglo American|Cerrejón Coal (former joint venture Anglo American, BHP & Glencore; now part of Glencore)" ~ "Cerrejón Coal",
+    Companies == "BHP|Cerrejón Coal (former joint venture Anglo American, BHP & Glencore; now part of Glencore)" ~ "Cerrejón Coal",
+    Companies == "Cerrejón Coal (former joint venture Anglo American, BHP & Glencore; now part of Glencore)" ~ "Cerrejón Coal",
+    Companies == "Cerrejón Coal (former joint venture Anglo American, BHP & Glencore; now part of Glencore)|Glencore" ~ "Cerrejón Coal",
+    Companies == "Eni|Karachaganak Petroleum Operating (KPO)" ~ "Karachaganak Petroleum Operating (KPO)",
+    Companies == "Karachaganak Petroleum Operating (KPO)" ~ "Karachaganak Petroleum Operating (KPO)",
+    Companies == "AmBev (part of Anheuser-Busch InBev)" ~ "Anheuser-Busch InBev",
+    Companies == "InBev (part of Anheuser-Busch InBev)" ~ "Anheuser-Busch InBev",
+    Companies == "ITM Mining|Sociedade Mineira do Cuango (joint venture ITM Mining, Endiama & Lumanhe)" ~ "ITM Mining|Sociedade Mineira do Cuango (joint venture ITM Mining, Endiama & Lumanhe)",
+    Companies == "Sociedade Mineira do Cuango (joint venture ITM Mining, Endiama & Lumanhe)" ~ "ITM Mining|Sociedade Mineira do Cuango (joint venture ITM Mining, Endiama & Lumanhe)",
+    Companies == "JBS|Pilgrim's (part of JBS)" ~ "JBS",
+    Companies == "Pilgrim's (part of JBS)" ~ "JBS",
+    Companies == "BHP|Samarco Mineraçao S.A. (Joint venture between Vale S.A. (50%) and BHP (50%))|Vale" ~ "BHP|Samarco Mineraçao S.A. (Joint venture between Vale S.A. (50%) and BHP (50%))|Vale",
+    Companies == "Samarco Mineraçao S.A. (Joint venture between Vale S.A. (50%) and BHP (50%))" ~ "BHP|Samarco Mineraçao S.A. (Joint venture between Vale S.A. (50%) and BHP (50%))|Vale",
+    Companies == "Toplоfikatsia - Pleven EAD" ~ "Toplofikatsia",
+    Companies == "Toplоfikatsia - Sliven EAD" ~ "Toplofikatsia",
+    Companies == "Toplоfikatsia - Vratsa EAD" ~ "Toplofikatsia",
+    Companies == "Toplоfikatsia - Veliko Tarnovo EAD" ~ "Toplofikatsia",
+    Companies == "Toplоfikatsia - Ruse EAD" ~ "Toplofikatsia",
+    Companies == "Toplоfikatsia - Burgas EAD" ~ "Toplofikatsia",
+    Companies == "Toplоfikatsia - Pernik EAD" ~ "Toplofikatsia",
+    Companies == "Raymond (part of Raymond Group)" ~ "Raymond",
+    Companies == "Raymond Ltd (part of Raymond Group)" ~ "Raymond",
+    Companies == "Argus Comercio E Exportacao De Alimentos Ltda|Benevides Madeiras" ~ "Argus Comercio E Exportacao De Alimentos Ltda|Benevides Madeiras",
+    Companies == "Argus Comercio E Exportacao De Alimentos Ltda|Benevides Madeiras|Tradelink" ~ "Argus Comercio E Exportacao De Alimentos Ltda|Benevides Madeiras",
+    Companies == "Kmart Australia (part of Wesfarmers)" ~ "Kmart Australia (part of Wesfarmers)",
+    Companies == "Target Australia (part of Wesfarmers)" ~ "Kmart Australia (part of Wesfarmers)",
+    Companies == "Groupe Casino|Grupo Pão de Açúcar - Companhia Brasileira de Distribuição (part of Groupe Casino)" ~ "Groupe Casino|Grupo Pão de Açúcar - Companhia Brasileira de Distribuição (part of Groupe Casino)",
+    Companies == "Grupo Pão de Açúcar - Companhia Brasileira de Distribuição (part of Groupe Casino)" ~ "Groupe Casino|Grupo Pão de Açúcar - Companhia Brasileira de Distribuição (part of Groupe Casino)",
+    Companies == "China National Aero-Technology Import & Export Corporation" ~ "China National Aero-Technology Import & Export Corporation",
+    Companies == "China National Aero-Technology Import & Export Corporation (CATIC)" ~ "China National Aero-Technology Import & Export Corporation",
+    Companies == "Anglo American|BHP|Cerrejón Coal (former joint venture Anglo American, BHP & Glencore; now part of Glencore)|Glencore" ~ "Cerrejón Coal",
+    Companies == "Anglo American|Cerrejón Coal (former joint venture Anglo American, BHP & Glencore; now part of Glencore)" ~ "Cerrejón Coal",
+    Companies == "KT Group" ~ "KT Group",
+    Companies == "Gran Tierra Energy" ~ "Gran Tierra Energy",
+    Companies == "GranTierra Energy" ~ "Gran Tierra Energy",
+    Companies == "AES Andes (part of AES Corporation)" ~ "AES Andes (part of AES Corporation)",
+    Companies == "AES|AES Andes (part of AES Corporation)" ~ "AES Andes (part of AES Corporation)",
+    Companies == "Japan Shipowners Mutual Protection & Indemnity Association" ~ "Japan Shipowners Mutual Protection & Indemnity Association",
+    Companies == "Shipowners Mutual Protection & Indemnity Association" ~ "Japan Shipowners Mutual Protection & Indemnity Association",
+    Companies == "AEON|Topvalu Collection (part of AEON)" ~ "AEON|Topvalu Collection (part of AEON)",
+    Companies == "Topvalu Collection (part of AEON)" ~ "AEON|Topvalu Collection (part of AEON)",
+    Companies == "BNK Financial Investment" ~ "BNK Financial Investment",
+    Companies == "SHEIN (part of Roadget Business Pte Ltd)" ~ "SHEIN (part of Roadget Business Pte Ltd)",
+    Companies == "SHEIN (part of Roadget Business Pte Ltd)|Temu" ~ "SHEIN (part of Roadget Business Pte Ltd)",
+    TRUE ~ Companies
+  ))
+```
+
+```{r Countries}
+
+## Imputation per Hand & Chatty 
+#transparent_imputed <- read.csv("BHRRC_countries_final_merged.csv")
+
+## neue datei nur für Kontinente --> Viz später
+# mehr als die HQ --> manche verstöße in mehreren Ländern
+
+long <- read.csv("country_continent_long_with_company_info.csv")
+
+#long_ru <- long 
+
+# ggf. no data rausfiltern
+
+# Viz
+
+library(dplyr)
+library(ggplot2)
+library(rnaturalearth)
+library(sf)
+
+# === Weltkarte laden (einfach, politisch) ===
+world <- ne_countries(scale = "medium", returnclass = "sf")
+
+
+
+continent_coords <- tibble::tibble(
+  Continent = c("Africa", "Asia", "Europe", "North America", "South America", "Australia", "Global", "no_data", "Other"),
+  lon = c(20, 100, 15, -100, -60, 135, 0, 160, -140),
+  lat = c(5, 40, 50, 45, -15, -25, 0, 80, -50)
+)
+
+# === Daten vorbereiten (wie vorher) ===
+europe_data <- long %>% 
+ # filter(HQ_Country != "RU") %>% russland hat fast nur bei sich verstöße 
+  filter(HQ_Continent == "Europe") %>%
+  count(Continent, name = "Count")
+
+
+
+europe_plot_data <- europe_data %>%
+  left_join(continent_coords, by = "Continent")
+
+# === Plot mit Weltkarte ===
+ggplot() +
+  geom_sf(data = world, fill = "gray90", color = "white") +
+  geom_point(data = europe_plot_data, aes(x = lon, y = lat, size = Count), color = "red", alpha = 0.6) +
+  geom_text(data = europe_plot_data, aes(x = lon, y = lat, label = paste0(Continent, "\n", Count)),
+            vjust = -1.2, size = 3.5) +
+  scale_size_continuous(range = c(4, 20)) +
+  coord_sf(xlim = c(-180, 180), ylim = c(-60, 90)) +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank(),
+        panel.grid = element_blank()) +
+  labs(
+    title = "Menschenrechtsverstöße durch Unternehmen mit Sitz in Europa",
+    subtitle = "Aggregiert nach Kontinent",
+    size = "Anzahl Fälle"
+  )
+
+# Für North America
+
+na_data <- long %>%
+  filter(HQ_Continent == "North America") %>%
+  count(Continent, name = "Count")
+
+na_plot_data <- na_data %>%
+  left_join(continent_coords, by = "Continent")
+
+# === Plot mit Weltkarte ===
+ggplot() +
+  geom_sf(data = world, fill = "gray90", color = "white") +
+  geom_point(data = na_plot_data, aes(x = lon, y = lat, size = Count), color = "red", alpha = 0.6) +
+  geom_text(data = na_plot_data, aes(x = lon, y = lat, label = paste0(Continent, "\n", Count)),
+            vjust = -1.2, size = 3.5) +
+  scale_size_continuous(range = c(4, 20)) +
+  coord_sf(xlim = c(-180, 180), ylim = c(-60, 90)) +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.title = element_blank(),
+        panel.grid = element_blank()) +
+  labs(
+    title = "Menschenrechtsverstöße durch Unternehmen mit Sitz in Nordamerika",
+    subtitle = "Aggregiert nach Kontinent",
+    size = "Anzahl Fälle"
+  )
+
+## Anpassung in der großen datei für Country codes
+ 
+transparent4 <- transparent3 %>%
+  mutate(Countries_Filled = ifelse(Countries_Filled == "GO", "Global", Countries_Filled)) %>%
+  mutate(Countries_Filled = ifelse(is.na(Countries_Filled) | Countries_Filled == "", "no_data", Countries_Filled))
+
+
+
+```
+
+```{r Order1}
+
+transparent5 <- transparent4 %>%
+  select(-Link.to.Company.Page, -Authors, -Title, - InferredCountry, -Company.Sectors, -Company.Headquarters, -Countries) %>% 
+  relocate(SectorCategory, .after = 1) %>% 
+  relocate(HQ_Country, .after = 2) %>% 
+  relocate(Countries_Filled, .after = 3) %>% 
+  relocate(Backdate, .after = 4) %>% 
+  relocate(Responded, .after = 5)%>% 
+  relocate(German, .after = 6) %>% 
+  mutate(across(where(is.character), ~na_if(., ""))) %>% 
+   filter(!is.na(HQ_Country), HQ_Country != "", ## filter the missings 
+         !is.na(Companies), Companies != "")
+
+#plot_missing(transparent5)
+
+```
+
+```{r tags_funktioniert}
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(ggplot2)
+
+# === 1. Aufsplitten & Bereinigen ===
+tags_long <- transparent5 %>%
+  select(URL, Tags) %>%
+  filter(!is.na(Tags), str_trim(Tags) != "") %>%
+  mutate(Tag = str_split(Tags, "\\|")) %>%
+  unnest(Tag) %>%
+  mutate(Tag = str_trim(Tag)) %>%
+  filter(Tag != "" & !is.na(Tag))
+
+# === 2. Kategorisierungsfunktion ===
+categorize_tags <- function(tag) {
+  case_when(
+    # Labour Rights & Workers
+    str_detect(tag, regex("Labour Rights|Forced Labour|Living Wage|Freedom of Association|Wage Theft|Child Labour|Occupational Health & Safety|Recruitment Fees|Workers/Employees|Adequate Living Standards|Housing|Impacts on Livelihoods|Precarious/Unsuitable Living Conditions|Gig Economy|Work & Conditions|Dismissal|Reasonable Working Hours & Leisure Time|Retention of identity documents", ignore_case = TRUE)) ~ "Labour Rights & Workers",
+    
+    # Environment & Climate
+    str_detect(tag, regex("Environment|Climate Crisis|Access to Water|Water pollution|Right to Food|Impact Assessment|Air pollution|Impact on notable or protected areas|Heat exposure|Soil pollution", ignore_case = TRUE)) ~ "Environment & Climate",
+    
+    # Security & Conflict
+    str_detect(tag, regex("Security Issues & Conflict Zones|Conflict & Peace|Violence|Killings|Deaths|Intimidation|Protests|Humanitarian Law|Death threats|Genocide|Torture & Ill-treatment|Disappearances|Conflict prevention & resolution|Armed groups|State armed forces|Forced Relocation", ignore_case = TRUE)) ~ "Security & Conflict",
+    
+    # Health & Safety
+    str_detect(tag, regex("Health|Injuries|Covid-19|Surveillance|Right to Privacy|Restricted access to medicines|Illness|Heat exposure", ignore_case = TRUE)) ~ "Health & Safety",
+    
+    # Land & Indigenous Rights
+    str_detect(tag, regex("Land Rights|Indigenous Peoples|Free, prior & informed consent|Displacement|Insufficient/inadequate consultation", ignore_case = TRUE)) ~ "Land & Indigenous Rights",
+    
+    # Trade & Corporate Practices
+    str_detect(tag, regex("Supply Chains|Trade|Sanctions|Purchasing practices|Chinese Overseas Investment|FIFA World Cup|Divestment|Extractive Industries Transparency Initiative \\(EITI\\)", ignore_case = TRUE)) ~ "Trade & Corporate Practices",
+    
+    # Freedom & Human Rights
+    str_detect(tag, regex("Freedom of Expression|Freedom of Association|Access to Information|Economic, Social, and Cultural Rights|Human Rights Defenders|Protection from arbitrary arrest|Freedom of Movement|Ownership of Property & Possessions|Human rights monitoring|Cultural Rights|Right to Education|Freedom of Assembly|Unfair trial|Access to Non-Judicial Remedy|Digital Freedoms", ignore_case = TRUE)) ~ "Freedom & Human Rights",
+    
+    # Discrimination & Social Justice
+    str_detect(tag, regex("Racial|ethnicity|caste|origin discrimination|Migrants|Immigrants|Just transition|Women|Rape & sexual abuse|Gender discrimination|Sexual harassment|Other Discrimination|Children|Human Trafficking", ignore_case = TRUE)) ~ "Discrimination & Social Justice",
+    
+    # Legal & Due Diligence
+    str_detect(tag, regex("Lawsuits|regulatory action|HREDD|Due Diligence|UN Guiding Principles on Business & Human Rights \\(UNGPs\\)|Corporate Legal Accountability|Judicial system", ignore_case = TRUE)) ~ "Legal & Due Diligence",
+    
+    # Complicity & Corporate Conduct
+    str_detect(tag, regex("Complicity|Project financing & loans|Payments to governments|Beneficial ownership|Business-military collusion|Company Support for Initiatives Promoting Development", ignore_case = TRUE)) ~ "Complicity & Corporate Conduct",
+    
+    # Governance & Transparency
+    str_detect(tag, regex("Tax avoidance|Anti-corruption|Corruption|Socially-responsible investing & shareholder activism|Company Policies", ignore_case = TRUE)) ~ "Governance & Transparency",
+    
+    # Sonstiges
+    TRUE ~ "Other"
+  )
+}
+
+# === 3. Kategorisieren ===
+tags_long <- tags_long %>%
+  mutate(Category = categorize_tags(Tag))
+
+# === 4. Verteilung plotten ===
+category_distribution <- tags_long %>%
+  count(Category, sort = TRUE)
+
+ggplot(category_distribution, aes(x = reorder(Category, n), y = n)) +
+  geom_col(fill = "steelblue") +
+  coord_flip() +
+  labs(
+    title = "Verteilung der Menschenrechtsverstoß-Kategorien (aktualisiert)",
+    x = "Kategorie",
+    y = "Anzahl der Schlagwörter"
+  ) +
+  theme_minimal()
+
+
+```
+
+```{r langer_datensatz}
+library(dplyr)
+library(stringr)
+library(tidyr)
+
+# === 1. Countries_Filled aufsplitten ===
+countries_long <- transparent5 %>%
+  select(URL, Countries_Filled) %>%
+  filter(!is.na(Countries_Filled), str_trim(Countries_Filled) != "") %>%
+  mutate(Country_Code = str_split(Countries_Filled, "\\|")) %>%
+  unnest(Country_Code) %>%
+  mutate(Country_Code = str_trim(Country_Code)) %>%
+  filter(Country_Code != "" & !is.na(Country_Code))
+
+# === 2. Tags aufsplitten & kategorisieren (wie vorher) ===
+tags_long <- transparent5 %>%
+  select(URL, Tags) %>%
+  filter(!is.na(Tags), str_trim(Tags) != "") %>%
+  mutate(Tag = str_split(Tags, "\\|")) %>%
+  unnest(Tag) %>%
+  mutate(Tag = str_trim(Tag)) %>%
+  filter(Tag != "" & !is.na(Tag)) %>%
+  mutate(Category = categorize_tags(Tag))
+
+# === 3. Länder- und Tag-Kategorien zusammenführen ===
+long_combined <- countries_long %>%
+  inner_join(tags_long, by = "URL")  # Jeder URL kriegt alle Länder und alle Kategorien
+
+# === 4. Restliche Variablen aus transparent5 hinzufügen ===
+transparent6 <- long_combined %>%
+  left_join(transparent5, by = "URL") #%>%
+  #select(-Tags, -Countries_Filled)  # Alte Spalten raus, nur aufgesplittet behalten
+
+
+```
+
+```{r Continents}
+# === 1. Mapping-Tabelle für Kontinente ===
+continent_map <- c(
+  # Europe
+  "AL" = "Europe", "AT" = "Europe", "BE" = "Europe", "BG" = "Europe", "CH" = "Europe",
+  "CY" = "Europe", "CZ" = "Europe", "DE" = "Europe", "DK" = "Europe", "EE" = "Europe",
+  "ES" = "Europe", "FI" = "Europe", "FR" = "Europe", "GB" = "Europe", "GR" = "Europe",
+  "HR" = "Europe", "HU" = "Europe", "IE" = "Europe", "IS" = "Europe", "IT" = "Europe",
+  "LT" = "Europe", "LU" = "Europe", "LV" = "Europe", "MT" = "Europe", "NL" = "Europe",
+  "NO" = "Europe", "PL" = "Europe", "PT" = "Europe", "RO" = "Europe", "RS" = "Europe",
+  "SE" = "Europe", "SI" = "Europe", "SK" = "Europe", "UA" = "Europe", "XK" = "Europe",
+  "BA" = "Europe", "BY" = "Europe", "MD" = "Europe", "ME" = "Europe", "MK" = "Europe", "RU" = "Europe",
+  
+  # Asia
+  "AE" = "Asia", "AF" = "Asia", "AM" = "Asia", "AZ" = "Asia", "BD" = "Asia", "BH" = "Asia",
+  "BN" = "Asia", "BT" = "Asia", "CN" = "Asia", "GE" = "Asia", "ID" = "Asia", "IL" = "Asia",
+  "IN" = "Asia", "IQ" = "Asia", "IR" = "Asia", "JO" = "Asia", "JP" = "Asia", "KH" = "Asia",
+  "KR" = "Asia", "KW" = "Asia", "KZ" = "Asia", "LA" = "Asia", "LB" = "Asia", "LK" = "Asia",
+  "MM" = "Asia", "MN" = "Asia", "MY" = "Asia", "NP" = "Asia", "OM" = "Asia", "PH" = "Asia",
+  "PK" = "Asia", "PS" = "Asia", "QA" = "Asia", "SA" = "Asia", "SG" = "Asia", "SY" = "Asia",
+  "TH" = "Asia", "TJ" = "Asia", "TL" = "Asia", "TM" = "Asia", "TR" = "Asia", "TW" = "Asia",
+  "UZ" = "Asia", "VN" = "Asia", "YE" = "Asia", "KG" = "Asia", "KP" = "Asia", "HK" = "Asia", "IO" = "Asia",
+
+  # Africa
+  "AO" = "Africa", "BF" = "Africa", "BI" = "Africa", "BJ" = "Africa", "BW" = "Africa",
+  "CD" = "Africa", "CF" = "Africa", "CG" = "Africa", "CI" = "Africa", "CM" = "Africa",
+  "DJ" = "Africa", "DZ" = "Africa", "EG" = "Africa", "EH" = "Africa", "ER" = "Africa",
+  "ET" = "Africa", "GA" = "Africa", "GH" = "Africa", "GM" = "Africa", "GN" = "Africa",
+  "GQ" = "Africa", "KE" = "Africa", "KM" = "Africa", "LR" = "Africa", "LS" = "Africa",
+  "LY" = "Africa", "MA" = "Africa", "MG" = "Africa", "ML" = "Africa", "MR" = "Africa",
+  "MU" = "Africa", "MW" = "Africa", "MZ" = "Africa", "NA" = "Africa", "NE" = "Africa",
+  "NG" = "Africa", "RE" = "Africa", "RW" = "Africa", "SC" = "Africa", "SD" = "Africa",
+  "SH" = "Africa", "SL" = "Africa", "SN" = "Africa", "SO" = "Africa", "SS" = "Africa",
+  "ST" = "Africa", "SZ" = "Africa", "TD" = "Africa", "TG" = "Africa", "TN" = "Africa",
+  "TZ" = "Africa", "UG" = "Africa", "YT" = "Africa", "ZA" = "Africa", "ZM" = "Africa", "ZW" = "Africa",
+  "GW" = "Africa", "DC" = "Africa", "ZU" = "Africa",
+
+  # North America (nur USA und Kanada)
+  "US" = "North America", "CA" = "North America",
+
+  # South America (inkl. Mittelamerika & Karibik)
+  "MX" = "South America", "GT" = "South America", "SV" = "South America", "HN" = "South America",
+  "NI" = "South America", "CR" = "South America", "PA" = "South America", "BS" = "South America",
+  "CU" = "South America", "DO" = "South America", "HT" = "South America", "JM" = "South America",
+  "HD" = "South America", "PN" = "South America",
+  "AR" = "South America", "BO" = "South America", "BR" = "South America", "CL" = "South America",
+  "CO" = "South America", "EC" = "South America", "GY" = "South America", "PE" = "South America",
+  "PY" = "South America", "SR" = "South America", "UY" = "South America", "VE" = "South America",
+
+  # Australia & Oceania
+  "AU" = "Australia", "FJ" = "Australia", "NZ" = "Australia", "PG" = "Australia", "WS" = "Australia",
+  "SB" = "Australia", "TO" = "Australia", "TV" = "Australia", "VU" = "Australia",
+  
+  # Sonderfälle
+  "Global" = "Global", "GO"= "Global", "no_data" = "no_data"
+)
+
+# === 2. Kontinent-Spalte zuordnen (für deine Long-Tabelle) ===
+transparent7 <- transparent6 %>%
+  mutate(Continent = ifelse(Country_Code %in% names(continent_map), continent_map[Country_Code], "Other")) %>%
+  mutate(HQ_Continent = ifelse(HQ_Country %in% names(continent_map), continent_map[HQ_Country], "Other"))
+
+```
+
+```{r final_transformation}
+transparent8 <- transparent7 %>%
+  mutate(Backdate = ymd(str_replace_all(Backdate, "\\.", "-")), 
+                        Year = year(Backdate)) %>%
+  select(-Countries_Filled.x,-Countries_Filled.y, -Tags.x,-Tags.y, -Tag, -Responded.To, - German, -Response.Sectors, -Regions, -Backdate) %>% 
+  relocate(Companies, .after = 1) %>% 
+  relocate(SectorCategory, .after = 2) %>% 
+  relocate(HQ_Country, .after = 3) %>% 
+  relocate(HQ_Continent, .after = 4) %>% 
+  relocate(Country_Code, .after = 5) %>% 
+  relocate(Continent, .after = 6) %>% 
+  relocate(Year, .after = 7) %>% 
+  relocate(Category, .after = 8)%>% 
+  relocate(Responded, .after = 9)%>% 
+  relocate(URL, .after = 10)  %>% 
+  mutate(across(everything(), as.factor))
+  
+  
+```
+
+```{r Viz}
+
+# Anfragen über Zeit
+
+# Monatsweise für Total & Answered
+monthly_summary <- transparent4 %>%
+  group_by(Month) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE)
+  ) %>%
+  filter(Month >= ymd("2005-01-01"))
+
+# Jahresweise Quote berechnen
+yearly_quote <- transparent4 %>%
+  group_by(Year) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE)
+  ) %>%
+  mutate(
+    Quote = Answered / Total,
+    YearStart = ymd(paste0(Year, "-01-01"))
+  ) %>%
+  filter(Year >= 2005)
+
+
+# Plotten
+ggplot() +
+  geom_line(data = monthly_summary, aes(x = Month, y = Total), color = "grey", size = 1) +
+  geom_line(data = monthly_summary, aes(x = Month, y = Answered), color = "black", size = 1) +
+  geom_line(data = yearly_quote, aes(x = YearStart, y = Quote * max(monthly_summary$Total)), color = "red", size = 1) +
+  geom_point(data = yearly_quote, aes(x = YearStart, y = Quote * max(monthly_summary$Total)), color = "red", size = 2) +
+  scale_y_continuous(
+    name = "Anzahl Antworten",
+    sec.axis = sec_axis(~ . / max(monthly_summary$Total), name = "Positive Antwortrate", labels = scales::percent)
+  ) +
+  labs(
+    title = "Antwortverhalten über die Zeit",
+    x = "Jahr",
+    caption = "Grau: alle Anfragen (monatlich), Schwarz: 'Yes' (monatlich), Rot: jährliche Quote 'Yes'"
+  ) +
+  theme_minimal()
+
+## Antwortverhalten über die Zeit nach Branche 
+
+# Monat und Jahr extrahieren
+transparent4 <- transparent4 %>%
+  mutate(
+    Backdate = ymd(Backdate),
+    Month = floor_date(Backdate, "month"),
+    Year = year(Backdate)
+  )
+
+# Monatsweise: Total & Answered pro Branche
+monthly_summary <- transparent4 %>%
+  group_by(Month, SectorCategory) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(Month >= ymd("2005-01-01"))
+
+# Jahresweise Quote pro Branche
+yearly_quote <- transparent4 %>%
+  group_by(Year, SectorCategory) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    Quote = Answered / Total,
+    YearStart = ymd(paste0(Year, "-01-01"))
+  ) %>%
+  filter(Year >= 2005)
+
+# Max pro Panel zur Skalierung der Quote
+max_total_by_sector <- monthly_summary %>%
+  group_by(SectorCategory) %>%
+  summarise(MaxTotal = max(Total, na.rm = TRUE), .groups = "drop")
+
+# Mergen für Skalierung
+yearly_quote <- yearly_quote %>%
+  left_join(max_total_by_sector, by = "SectorCategory") %>%
+  mutate(QuoteScaled = Quote * MaxTotal)
+
+# Plot
+ggplot() +
+  geom_line(data = monthly_summary, aes(x = Month, y = Total), color = "grey", size = 1) +
+  geom_line(data = monthly_summary, aes(x = Month, y = Answered), color = "black", size = 1) +
+  geom_line(data = yearly_quote, aes(x = YearStart, y = QuoteScaled), color = "red", size = 1) +
+  geom_point(data = yearly_quote, aes(x = YearStart, y = QuoteScaled), color = "red", size = 1.5) +
+  scale_y_continuous(
+    name = "Anzahl Antworten",
+    sec.axis = sec_axis(~ . / max(monthly_summary$Total), name = "Positive Antwortrate", labels = percent)
+  ) +
+  facet_wrap(~ SectorCategory, scales = "free_y") +
+  labs(
+    title = "Antwortverhalten über die Zeit nach Branche",
+    x = "Jahr",
+    caption = "Grau: alle Anfragen, Schwarz: 'Yes', Rot: jährliche Quote 'Yes'"
+  ) +
+  theme_minimal() +
+  theme(strip.text = element_text(face = "bold"))
+
+
+## Antwortquoten nach Branche
+
+# Aggregation nach Branche
+sector_summary <- transparent4 %>%
+  group_by(SectorCategory) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE)
+  ) %>%
+  mutate(Quote = Answered / Total)
+
+# Sortierung nach Quote oder Total (optional):
+sector_summary <- sector_summary %>%
+  arrange(desc(Total))  # alternativ: desc(Total)
+
+# Plot
+ggplot(sector_summary, aes(x = reorder(SectorCategory, -Total))) +
+  geom_col(aes(y = Total), fill = "grey70") +
+  geom_point(aes(y = Quote * max(Total)), color = "red", size = 2) +
+  geom_line(aes(y = Quote * max(Total), group = 1), color = "red", linewidth = 1) +
+  scale_y_continuous(
+    name = "Anzahl Anfragen",
+    sec.axis = sec_axis(~ . / max(sector_summary$Total),
+                        name = "Antwortquote (Yes)",
+                        labels = percent_format())
+  ) +
+  labs(
+    title = "Antwortquote nach Branche",
+    x = "Branche",
+    caption = "Grau: Anzahl Anfragen, Rot: Anteil 'Yes'"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+## Antwortquote nach HQ
+
+# Top 15 Länder nach Anzahl Anfragen
+top_countries <- transparent4 %>%
+  count(HQ_Country, name = "Total") %>%
+  top_n(15, Total) %>%
+  pull(HQ_Country)
+
+# Zusammenfassen & berechnen
+country_summary <- transparent4 %>%
+  filter(HQ_Country %in% top_countries) %>%
+  group_by(HQ_Country) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE)
+  ) %>%
+  mutate(Quote = Answered / Total)
+
+# Plot
+ggplot(country_summary, aes(x = reorder(HQ_Country, -Total))) +
+  geom_col(aes(y = Total), fill = "grey70") +
+  geom_point(aes(y = Quote * max(Total)), color = "red", size = 2) +
+  geom_line(aes(y = Quote * max(Total), group = 1), color = "red", linewidth = 1) +
+  scale_y_continuous(
+    name = "Anzahl Anfragen",
+    sec.axis = sec_axis(~ . / max(country_summary$Total),
+                        name = "Antwortquote (Yes)",
+                        labels = percent)
+  ) +
+  labs(
+    title = "Antwortquote nach Hauptsitzland (Top 15)",
+    x = "Land (ISO-Code)",
+    caption = "Grau: Anzahl Anfragen, Rot: Anteil 'Yes'"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+## Antwortquote nach Company
+
+# Top 15 Companies nach Anzahl Anfragen
+top_companies <- transparent4 %>%
+  count(Companies, name = "Total") %>%
+  top_n(30, Total) %>%
+  pull(Companies)
+
+# Zusammenfassen & berechnen
+company_summary <- transparent4 %>%
+  filter(Companies %in% top_companies) %>%
+  group_by(Companies) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE)
+  ) %>%
+  mutate(Quote = Answered / Total)
+
+# Plot
+ggplot(company_summary, aes(x = reorder(Companies, -Total))) +
+  geom_col(aes(y = Total), fill = "grey70") +
+  geom_point(aes(y = Quote * max(Total)), color = "red", size = 2) +
+  geom_line(aes(y = Quote * max(Total), group = 1), color = "red", linewidth = 1) +
+  scale_y_continuous(
+    name = "Anzahl Anfragen",
+    sec.axis = sec_axis(~ . / max(company_summary$Total),
+                        name = "Antwortquote (Yes)",
+                        labels = percent)
+  ) +
+  labs(
+    title = "Antwortquote nach Unternehmen (Top 15)",
+    x = "Unternehmen",
+    caption = "Grau: Anzahl Anfragen, Rot: Anteil 'Yes'"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+## Vergleich DE Unternehmen/ andere Unternehmen und LkSG
+
+# Jahr extrahieren
+transparent4 <- transparent4 %>%
+  mutate(
+    Backdate = ymd(Backdate),
+    Year = year(Backdate)
+  )
+
+# Gruppieren nach Jahr & German
+quote_by_year <- transparent4 %>%
+  filter(Year >= 2005) %>%
+  group_by(Year, German) %>%
+  summarise(
+    Total = n(),
+    Answered = sum(Responded == "Yes", na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(Quote = Answered / Total)
+
+# Plot
+ggplot(quote_by_year, aes(x = Year, y = Quote, color = factor(German))) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  geom_vline(xintercept = 2023, linetype = "dashed", color = "black") +
+  scale_color_manual(
+    values = c("0" = "orange", "1" = "red"),
+    labels = c("Anderswo", "Deutschland"),
+    name = "Firmensitz"
+  ) +
+  scale_y_continuous(labels = percent_format(accuracy = 1)) +
+  scale_x_continuous(breaks = seq(2005, max(quote_by_year$Year), 1)) +
+  labs(
+    title = "Jährliche Antwortquote: Deutsche vs. andere Firmen",
+    x = "Jahr",
+    y = "Antwortquote (Yes)",
+    caption = "Schwarze Linie = LkSG-Start (Jan 2023)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+```{r feature_engineering}
+
+# Splits
+set.seed(1234)
+transparent_split <- initial_split(transparent8, prop = 0.8)
+transparent_train <- training(transparent_split)
+transparent_test <- testing(transparent_split)
+
+# Recipe (nicht mehr alle Prädiktoren dabei)
+recipe1 <- recipe(Responded ~ ., data = transparent_train) %>%
+ update_role(URL, new_role = "ID") %>% # id = URL festlegen
+#step_impute_knn(all_predictors()) %>% # missings imputieren 
+# step_novel(all_nominal_predictors()) %>% # Neue Levels ok  Variable? 
+#step_interact(terms = ~ ) %>%  #  Interaktion 
+step_dummy(all_nominal_predictors()) #%>% # Alter als numerische 
+#step_smote(Responded, over_ratio = 1) # Oversampling
+
+
+# Resamples 
+
+transparent_folds <- vfold_cv(transparent_train, v = 5 #,strata = Responded
+               ) # V-fold/k-fold cross-validation
+```
+
+```{r Workflow}
+#RandomForest
+# Model & Workflow (trees ggf. auf 1000 aber zu wenig Rechenleistung)
+
+model1 <- rand_forest(mtry = tune(), trees = 100, min_n = tune()) %>% 
+  set_engine("ranger", importance = "permutation") %>% 
+  set_mode("classification") 
+
+workflow1 <- workflow() %>% add_recipe(recipe1) %>% add_model(model1) 
+
+# Tune & Evaluate (Specify to use parallel processing)
+num_cores <- parallel::detectCores() - 1
+cl <- makeCluster(num_cores)
+registerDoParallel(cl)
+
+# Grid ggf. erhöhen aber zu wenig rechenleistung
+set.seed(4321)
+
+tune1_result <- tune_grid(workflow1, resamples = transparent_folds, grid = 3, control = control_grid(verbose = TRUE))
+
+tune1_result %>%
+  collect_metrics() %>%
+  filter(.metric == "roc_auc") %>%  # Nur ROC-Metrik behalten
+  dplyr::select(mean, mtry, min_n) %>%  # Variablen auswählen
+  pivot_longer(cols = min_n:mtry,  # Längere Darstellung
+               values_to = "value",
+               names_to = "parameter") %>%
+ggplot(aes(x = value, y = mean, color = parameter)) +
+  geom_point(show.legend = FALSE) +
+ facet_wrap(~parameter, scales = "free_x") +
+  labs(x = NULL, y = "roc_auc")
+ 
+
+# Personalisierter grid : Range aus vorherigem plot gelesen und nun umgesetzt 
+grid1 <- grid_regular(
+  mtry(range = c(25, 50)), # define range for mtry
+ min_n(range = c(5, 7)), # define range for min_n
+ levels = 6 # number of values of each parameter to use to make the regular grid  (ggf. erhöhen)
+)
+
+# Zweiter Versuch zur Visualisierung (auch hier die richtigen Metrics suchen)
+
+set.seed(678)
+
+tune1_result2 <- tune_grid(workflow1, resamples = transparent_folds, grid = grid1)
+
+tune_result_plot2 <- tune1_result2 %>%
+  collect_metrics() %>%
+  filter(.metric == "roc_auc") %>%  # Nur ROC behalten
+  dplyr::select(mean, mtry, min_n) %>%  # Variablen auswählen
+  pivot_longer(cols = min_n:mtry,  # Längere Darstellung
+               values_to = "value",
+               names_to = "parameter") %>%
+  ggplot(aes(x = value, y = mean, color = parameter)) +
+  geom_point(show.legend = FALSE) +
+  facet_wrap(~parameter, scales = "free_x") +
+  labs(x = NULL, y = "roc_auc")
+
+#stopCluster(cl)
+
+
+# Bestes Model auswählen 
+
+best1_hyper <- select_best(tune1_result2, metric = "roc_auc")
+
+model1_final <- finalize_model(model1,
+                              parameters = best1_hyper)
+
+
+# Viele Missings in irgendeinem Schritt, wahrscheinlich bei den Kategorien (andere in training & test)
+
+
+# Define final workflow
+workflow1_final <- workflow() %>%
+  add_recipe(recipe1) %>% #  use standard recipe
+  add_model(model1_final) # use final model
+
+# Fit final model
+fit1_final <- fit(workflow1_final, data = gesis_train)
+
+# Sobald mit Ergebnis zufrieden: predictions auf trainings-& testdata anwenden
+
+# ggf. in den Datensätzen speichern
+#metrics_combined <- metric_set(roc_auc, yardstick::accuracy, kap)
+
+#metrics_train_b <- augment(fit1_final, new_data = gesis_train) %>%
+#    metrics_combined(truth = vote_choice, estimate = .pred_class, .pred_0)
+#
+#metrics_test_b <- augment(fit1_final, new_data = gesis_test) %>% 
+#    metrics_combined(truth = vote_choice, estimate = .pred_class, .pred_0)
+
+# Test
+#augment_test2 <- augment(fit1_final, new_data = gesis_test)
+
+#augment_test2$.pred_class_adjusted <- ifelse(augment_test2$.pred_1 >= threshold, 1, 0) %>% as.factor()
+
+#metrics_test2 <- augment_test2 %>%
+ # mutate(.pred_class_adjusted = factor(.pred_class_adjusted, levels = levels(vote_choice)))%>% 
+  #  metrics_combined(truth = vote_choice, estimate = .pred_class_adjusted, .pred_0)
+
+
+```
+
+# Introduction
+
+-   Transparency = first step to respect of human rights –\> indicator (+requests mean, there are allegations)
+
+-   Relevanz: Herausfinden, welche Branchen, Unternehmen, Länder sind most unresponsive –\> auf diese dann qualitativen Fokus setzen (in anderen Studien)
+
+<!-- -->
+
+-   vielleicht auch die alte Idee von Difference in difference mit dem LkSG? genug Datenpunkte und mit Transparency kann man etwas messen: lm() in DiD Form
+
+-   dazu: Effekt eines bestimmten Events (Skandal & Medienaufmerksamkeit) auf die Transparenz in einer bestimmten Branche
+
+-   sonst: eher deskriptiv ausgelegt oder allgemeiner untersuchen: Demokratieindex und Menschenrechte –\> Einfluss auf Antwortverhalten
+
+-   Schlechteste/ least responsive Branchen, Companies & Länder —\> qualitativ aus Reports herausfinden, woran das liegt, oder welche Muster es da gibt
+
+-   auch: Untersuchen, wo sind die HQs und wo sind die Verstöße
+
+-   Replizieren oder Erweitern der Studie von Kamminga–\> verfünfachte anzahl an anfragen zehn jahre später: was hat sich verändert und welche trends oder schwerpunkte gibt es heute
+
+-   alles mögliche über den Zeitverlauf plotten (small multiples für Branche, HQ etc.)
+
+# Theory & Literature
+
+## Theory
+
+-   Begriffe klären (due dilligence, human rights, transparency)
+
+-   Gesetze vorstellen & initiativen: rechtliche Lage (UN Guiding Principles on Business and Human Rights) !!
+
+-   wie versucht man sich im Feld dem zu nähern, es zu analysieren/ theoretisieren ? politische Ökonomie ?
+
+## Literature Review
+
+-   Stand der Forschung: zum Datensatz und allgemein im Feld bezogen auf Transparenz etc.
+
+Kamminga:
+
+-   UN Special Representative on Business and Human Rights (SRSG) nature of abuses (direct/ indirect etc.)
+
+-   Relevanz und Messbarkeit-Argumentation: due dilligence Respekt nur wenn man zumindest auf Anfragen antworten kann S.5
+
+-   Argumentation zur Schwierigkeit der Bewertung, welche Unternehmen/ Länder wirklich "schlechter" sind: mehr anfragen = problematischer aber vllt auch wegen leichterer Verfügbarkeit der Daten/ mehr Forschung zu bestimmten (größeren) Unternehmen?
+
+-   Trends aus Results zusammenfassen und dann weiterhin überprüfen in der Analyse? oder zu starker Fokus auf Replikation
+
+-   kritisches Hinterfragen: kann man den Antworten trauen und bringen Sorgfaltspflichtgesetze etwas?
+
+<!-- -->
+
+-   hiervon ausgehend Literatur suchen und zitieren
+
+Hypothesen:
+
+-   
+
+# Data & Methods
+
+## Data
+
+-   heruntergeladen am 18. April 2025 (letzter Eintrag vom 17. April)
+-   Resource Centre und Datenerhebung ausführlich vorstellen mit Beispielen
+
+### Codierung von Sector
+
+mögliche Probleme/ Veränderungen: inzwischen viele diversifizierte Konglomerate und kompliziertere Geschäftsmodelle, außerdem KI zuweisung, möglicherweise nicht ganz so, wie es ein Mensch gemacht hätte (ggf. intercoder machen/ mit selbst, jonny). Problem vor allem diejenigen Unternehmen, welche in mehreren Branchen tätig sind zuzuordnen. ChatGPT ist folgendermaßen vorgegangen
+
+#### **Kategorisierung basierend auf Schlagwörtern in Kategorien nach Ruggie & Kamminga**
+
+Jeder enthaltene Sektor wurde gegen eine Liste typischer Schlüsselbegriffe abgeglichen, die für jede der 9 Zielkategorien definiert wurden (z. B. `"Mining"` → Extractive, `"Retail"` → Retail and consumer products, usw.).
+
+Beispiel für die Kategorie **Extractive**:
+
+`keywords = c("Mining", "Oil", "Gas", "Coal", "Hydropower", "Nuclear", "Natural Resources", "Metals", "Logging")`
+
+Für jede Ausprägung wurde gezählt, **wie oft Begriffe aus den Sektornamen mit den Schlagwörtern der Zielkategorien übereinstimmen**.
+
+#### **Entscheidung bei Mehrdeutigkeiten**
+
+Wenn mehrere Kategorien gleiche Punktzahlen hatten oder keine eindeutige Zuordnung möglich war, wurde folgende **Prioritätslogik** angewendet (basierend auf wirtschaftlicher Relevanz und Konsistenz):
+
+`Extractive > Heavy manufacturing > Infrastructure and utilities >  Information technology > Retail and consumer products >  Food and beverage > Financial services > Pharmaceutical and chemical > Other`
+
+Diese Priorisierung basiert auf Kapitalintensität, Einfluss auf Umwelt und Infrastruktur & gesellschaftliche Relevanz
+
+### Codierungen anderen Spalten erklären:
+
+-   German: HQ oder Verstoß in Deutschland
+
+-   HQ: anpassung bei mehrdeutigkeiten (Entscheidung für die erste aufgeführte Option) –\> vllt. interessant, ob es einen unterschied macht, wenn man für diese Fälle eine neue Kategorie aufmacht?
+
+-   Companies (kleine Anpassungen, zusammenführungen)
+
+## Methods
+
+-   kritisches Hinterfragen: kann man etwas aussagen mit diesen Daten? bedeutet eine Antwort, dass HR auch wirklich besser eingehalten werden?
+
+-   auch die Fragen selbst untersuchen? sehr aufwendig und andere Methode –\> ggf. Stichprobenartig zur Verdeutlichung (oder kann ich auch dort Klassifizierungen mit Chatty vornehmen?)
+
+# Results & Visualization
+
+-   welche weiteren Faktoren: democracy score country/ hq
+
+-   ml model
+
+## Analysis
+
+-   ggf. Recherchieren, welche Länder haben Transparenz/ Menschenrechts/ Due Dilligence/ Lieferkettenabkommen –\> neue Spalte damit
+
+-   ggf. Demokratie-/ Menschenrechtsindizes (im Land) anwenden für verschiedene Jahre –\> Respekt von HR im eigenen Land == Respekt in anderen Ländern
+
+-   UN Global Compact- Beteiliigung von Unternehmen, OECD Guidelines & co. –\> ggf. Kumulationsscore berechnen für internationale Instrumente: Theorie = Unternehmen, welche von vielen Guidelines etc. betroffen sind, sind auch eher bereit zu complyen
+
+-   genereller Einfluss von Politik auf die Unternehmen –\> kann man sie denn berühren ? wie weichen sie aus? welche faktoren auf Länderebene beeinflussen die Transparenz?
+
+<!-- -->
+
+-   DiD Analyse zeigt gegenteiligen trend und keinen Zusammenhang –\> vllt wegen vermehrten Anfragen ab 2020 ? –\> Konterintuitiv aber vllt. muss anders gesampled werden
+
+-   bias in der Zusammenstellung der Daten vonseiten des Research Centres ?
+
+-   Efffekt von Covid miteinbeziehen
+
+-   welche weiteren Faktoren müssen mitgerechnet werden, um ein sinnvolles Ergebnis zu erzielen?
+
+-   Einfluss von regionalen Bündnissen: BRICS, MERCOSUR, AECEAN, OECD, EU, AU etc. –\> macht das einen Unterschied?
+
+-   state owned/ private owned als Variable hinzufügen bei ausgewählten Analysen/ Teiluntersuchungen
+
+Zweiter Teil:
+
+-   Schlechteste/ least responsive Branchen, Companies & Länder —\> qualitativ aus Reports herausfinden, woran das liegt, oder welche Muster es da gibt
+
+# Diskussion
+
+-   Warum könnte der Trend entgegen der Erwartung laufen? Warum geht die Quote runter, obwohl deutsche unternehmen nun LkSG verpflichtet sind?
+
+-   Hängt die Antwortquote negativ mit der Anzahl der Anfragen zusammen? vielleicht davor Messfehler und nun mehr Genauigkeit ?
+
+-   Antwort nicht unbedingt eine positive Nachricht für die Menschenrechte, aber keine Antwort ist auf jeden Fall eine schlechte Nachricht
+
+# Conclusion
+
+## ToDo
+
+-   Vllt. supervised machine learning, predictive model
+
+-   **Wo finden die Abuses statt ? Firmen welcher Länder in welchen Regionen ?**
+
+-   **welche art von Abuses: tags systematisieren**
+
+-   long format datensatz nach countries & Tags erstellen
+
+-   demokratieindex nach jahr hinzufügen (freedomhouse/ v-dem je nach Datenverfügbarkeit)
+
+-   Literaturrecherche und Theorien überlegen: in Feld von Business & HR einlesen
+
+<!-- -->
+
+-   niedrigste Response Rate mit Filter von 10 Reports ebenso messen, nicht nur die größten (Firmen, Länder)
+
+<!-- -->
+
+-   Zusammenhänge visualisieren (Branche, HQ, companies)
+
+-   welche unternehmen werden am öftesten angefragt?
+
+Später ggf. :
+
+-   
+
+-   Regions ausfüllen auf basis von HQ
