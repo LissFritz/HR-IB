@@ -1403,7 +1403,7 @@ transparent_folds <- vfold_cv(transparent_train, v = 5 #,strata = Responded
 #RandomForest
 # Model & Workflow (trees ggf. auf 1000 aber zu wenig Rechenleistung)
 
-model1 <- rand_forest(mtry = tune(), trees = 100, min_n = tune()) %>% 
+model1 <- rand_forest(mtry = tune(), trees = 1000, min_n = tune()) %>% 
   set_engine("ranger", importance = "permutation") %>% 
   set_mode("classification") 
 
@@ -1417,7 +1417,11 @@ registerDoParallel(cl)
 # Grid ggf. erhöhen aber zu wenig rechenleistung
 set.seed(4321)
 
-tune1_result <- tune_grid(workflow1, resamples = transparent_folds, grid = 3, control = control_grid(verbose = TRUE))
+tune1_result <- tune_grid(workflow1, resamples = transparent_folds, grid = 10, control = control_grid(verbose = TRUE))
+
+write.csv(tune1_result, "tune1_result.csv")
+
+## ---- bis hier laufen lassen --- ##
 
 tune1_result %>%
   collect_metrics() %>%
